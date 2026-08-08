@@ -1,0 +1,10 @@
+streamlit
+streamlit-ace
+ollama
+chromadb
+crewai
+google-genai
+python-dotenv
+mcp
+ruff
+mypy

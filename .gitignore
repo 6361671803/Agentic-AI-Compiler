@@ -1,0 +1,24 @@
+# Secrets - never commit
+.env
+.env.example
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.mypy_cache/
+.ruff_cache/
+
+# Virtual environment
+venv/
+.venv/
+
+# Local generated data (RAG vector store, rebuilds automatically)
+.rag_store/
+
+# Claude Code local session state
+.claude/
+
+# OS
+Thumbs.db
+.DS_Store
