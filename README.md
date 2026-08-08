@@ -5,7 +5,7 @@ pipeline. Paste in Python code and it gets checked, fixed, explained, and
 security-scanned by four cooperating agents - each grounded by real tools
 (ast, ruff, mypy, sandboxed execution), not just an LLM's guess.
 
-##domolink:https://youtu.be/CsDJMVyDfqo?si=sJVikH-QX4cc8gSz
+##domolink
 
 ---
 
