@@ -42,8 +42,10 @@ type-check, sandboxed execution, PyPI dependency lookup) to any MCP client
 (Claude Desktop, Claude Code, etc.) over stdio.
 
 ### 🧠 Model backend
-Runs on **Gemini** (cloud, fast) by default, or **local Ollama** (free,
-private, no API key) with one environment variable - see Setup below.
+Runs on **Gemini** (cloud, fast) by default, **OpenRouter** (cloud, many
+models, typically the fastest - single-digit seconds per full pipeline run
+in testing), or **local Ollama** (free, private, no API key, slower on
+CPU-only machines) - switch with one environment variable, see Setup below.
 
 ---
 
@@ -52,7 +54,7 @@ private, no API key) with one environment variable - see Setup below.
 - Python
 - Streamlit + streamlit-ace (syntax-highlighted editor)
 - CrewAI (multi-agent orchestration)
-- Gemini API / Ollama (LLM backend)
+- Gemini API / OpenRouter / Ollama (LLM backend, switchable)
 - ChromaDB (local vector store for RAG)
 - MCP (Model Context Protocol)
 - ruff, mypy, ast (real static analysis - not LLM guesses)
@@ -121,6 +123,13 @@ Copy `.env.example` to `.env`, then either:
 GEMINI_API_KEY=your-real-key
 ```
 Get one at https://aistudio.google.com/apikey
+
+**Or use OpenRouter (cloud, many models, typically fastest)** - add your key and set:
+```env
+OPENROUTER_API_KEY=your-real-key
+CREW_MODEL=openrouter/openai/gpt-4o-mini
+```
+Get one at https://openrouter.ai/keys - swap the model for any listed at https://openrouter.ai/models
 
 **Or use local Ollama (free, private, no key needed)** - set:
 ```env
