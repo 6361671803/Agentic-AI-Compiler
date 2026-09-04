@@ -803,9 +803,12 @@ with tab_crew:
     elif "error" in crew_result:
         st.error(
             f"❌ Crew run failed: {crew_result['error']}\n\n"
-            "By default this needs a Gemini API key: copy `.env.example` to `.env` and set "
-            "`GEMINI_API_KEY` (get one at https://aistudio.google.com/apikey). To use local "
-            "Ollama instead, set `CREW_MODEL=ollama/qwen2.5-coder:7b` in `.env`."
+            "This needs one of three backends configured in `.env` (copy from `.env.example`):\n\n"
+            "- **Gemini** (default): set `GEMINI_API_KEY` - https://aistudio.google.com/apikey\n"
+            "- **OpenRouter** (fast, many models): set `OPENROUTER_API_KEY` and "
+            "`CREW_MODEL=openrouter/openai/gpt-4o-mini` - https://openrouter.ai/keys\n"
+            "- **Ollama** (free, local, slower): set `CREW_MODEL=ollama/qwen2.5-coder:7b` and run "
+            "`ollama serve`"
         )
     else:
         knowledge_sources = crew_result.get("knowledge_sources") or []

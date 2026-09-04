@@ -47,8 +47,15 @@ from compiler.checks import (
 from agents.text_utils import extract_code_block as _extract_code_block
 from agents.rag import retrieve as _retrieve, remember_fix as _remember_fix
 
-# Cloud by default for speed; CREW_MODEL=ollama/qwen2.5-coder:7b (or any other
-# ollama/<model>) switches back to local-only with no API key needed.
+# Three interchangeable backends, switched purely via CREW_MODEL's provider
+# prefix - no code change needed to move between them:
+#   gemini/<model>      (default) - needs GEMINI_API_KEY
+#   openrouter/<model>             - needs OPENROUTER_API_KEY, e.g.
+#                                    openrouter/openai/gpt-4o-mini
+#   ollama/<model>                 - local, free, no key, needs `ollama serve`
+# CrewAI's LLM class natively recognises the "gemini/" and "openrouter/"
+# prefixes and reads the matching *_API_KEY env var itself; only "ollama/"
+# needs the explicit base_url override below, since it's not a hosted API.
 CREW_MODEL = os.getenv("CREW_MODEL", "gemini/gemini-2.0-flash")
 OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
 # Stage 2 (Debug) has to fit a full corrected file plus line-by-line diffs,
