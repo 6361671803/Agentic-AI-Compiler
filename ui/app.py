@@ -746,7 +746,14 @@ if run_code_btn:
     # than exec()-ing straight into this Streamlit server process - code that
     # calls exit()/quit()/sys.exit() or loops forever can no longer kill or
     # hang the whole app; it just fails/times out in its own subprocess.
-    sandboxed = run_code_sandboxed(code)
+    try:
+        sandboxed = run_code_sandboxed(code)
+    except Exception as e:
+        # Defensive: run_code_sandboxed() already handles the known failure
+        # modes internally (timeout, bad input to subprocess), but nothing
+        # here should ever be able to take the whole Streamlit server down
+        # just because of what a user pasted into the editor.
+        sandboxed = {"timed_out": False, "exit_code": 1, "stdout": "", "stderr": str(e)}
     if sandboxed["timed_out"]:
         st.session_state["run_result"] = {
             "ok": False,
