@@ -29,6 +29,17 @@ security-scanned by four cooperating agents - each grounded by real tools
 - **Run Multi-Agent Analysis** - the full pipeline above, thorough
 - **Run Code** - just execute and see output, no AI involved
 
+### 🛡️ Safe Code Execution
+**Run Code** executes your pasted code in an isolated, time-bounded
+subprocess (`compiler/sandbox.py`) rather than inside the Streamlit server
+process itself - the same sandboxing the MCP server and the pipeline's own
+verification step already used. This was a real, fixed bug: code containing
+`exit()`/`sys.exit()`, an infinite loop, or even a stray null byte used to
+crash or hang the whole app (a blank/white screen) by taking down the
+in-process `exec()` call directly. Now any of that just fails or times out
+safely inside its own subprocess and reports the error in the output panel,
+with the rest of the app unaffected.
+
 ### 📚 RAG (Retrieval-Augmented Generation)
 Grounds the pipeline in a curated Python knowledge base (built-in
 exceptions, PEP 8) plus a running memory of code you've submitted before and

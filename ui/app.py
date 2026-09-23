@@ -7,7 +7,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 import streamlit as st
 from streamlit_ace import st_ace
-from compiler.executor import execute_code
+from compiler.sandbox import run_code_sandboxed
 from agents.rag import index_knowledge, index_upload
 from agents.crew import run_crew
 from agents.text_utils import extract_code_block
@@ -742,10 +742,30 @@ st.markdown('<div class="divider-gradient"></div>', unsafe_allow_html=True)
 # ============================================================================
 
 if run_code_btn:
+    # Runs in an isolated subprocess with a timeout (compiler/sandbox.py) rather
+    # than exec()-ing straight into this Streamlit server process - code that
+    # calls exit()/quit()/sys.exit() or loops forever can no longer kill or
+    # hang the whole app; it just fails/times out in its own subprocess.
     try:
-        st.session_state["run_result"] = {"ok": True, "output": execute_code(code)}
+        sandboxed = run_code_sandboxed(code)
     except Exception as e:
-        st.session_state["run_result"] = {"ok": False, "output": str(e)}
+        # Defensive: run_code_sandboxed() already handles the known failure
+        # modes internally (timeout, bad input to subprocess), but nothing
+        # here should ever be able to take the whole Streamlit server down
+        # just because of what a user pasted into the editor.
+        sandboxed = {"timed_out": False, "exit_code": 1, "stdout": "", "stderr": str(e)}
+    if sandboxed["timed_out"]:
+        st.session_state["run_result"] = {
+            "ok": False,
+            "output": sandboxed["stderr"] or "Execution timed out.",
+        }
+    elif sandboxed["exit_code"] == 0:
+        st.session_state["run_result"] = {"ok": True, "output": sandboxed["stdout"]}
+    else:
+        st.session_state["run_result"] = {
+            "ok": False,
+            "output": sandboxed["stderr"] or f"Process exited with code {sandboxed['exit_code']}",
+        }
 
 if run_crew_btn:
     steps = []
