@@ -63,6 +63,13 @@ OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
 # generating tokens for minutes.
 CREW_MAX_TOKENS = int(os.getenv("CREW_MAX_TOKENS", "2048"))
 CREW_MAX_ITER = int(os.getenv("CREW_MAX_ITER", "6"))
+# Each agent call has no timeout by default in crewai's LLM class, so a
+# stalled network request (e.g. while this app's localhost is being shared
+# out through a tunnel) hangs the whole 4-stage pipeline forever with no
+# error - just an endless "analyzing" spinner. This caps a single LLM call
+# so it raises instead, which the UI's existing try/except already turns
+# into a visible error.
+CREW_LLM_TIMEOUT_SECONDS = int(os.getenv("CREW_LLM_TIMEOUT_SECONDS", "60"))
 # How many extra fix passes the Debug Agent's own output gets if the real
 # checkers still find something wrong with the code it just produced.
 DEBUG_VERIFY_RETRIES = int(os.getenv("DEBUG_VERIFY_RETRIES", "2"))
@@ -75,11 +82,13 @@ def _build_llm():
             base_url=OLLAMA_BASE_URL,
             temperature=0.2,
             max_tokens=CREW_MAX_TOKENS,
+            timeout=CREW_LLM_TIMEOUT_SECONDS,
         )
     return LLM(
         model=CREW_MODEL,
         temperature=0.2,
         max_tokens=CREW_MAX_TOKENS,
+        timeout=CREW_LLM_TIMEOUT_SECONDS,
     )
 
 PLAIN_LANGUAGE_RULE = (
