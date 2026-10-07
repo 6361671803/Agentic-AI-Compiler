@@ -37,6 +37,7 @@ verification step already used. This was a real, fixed bug: code containing
 `exit()`/`sys.exit()`, an infinite loop, or even a stray null byte used to
 crash or hang the whole app (a blank/white screen) by taking down the
 in-process `exec()` call directly. Now any of that just fails or times out
+(after 10 seconds, see `DEFAULT_TIMEOUT_SECONDS` in `compiler/sandbox.py`)
 safely inside its own subprocess and reports the error in the output panel,
 with the rest of the app unaffected.
 
